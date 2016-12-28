@@ -1,5 +1,63 @@
 "use strict";
 
+function calc() {
+	var sum = 0;
+
+	input.split("\n").forEach(function(line) {
+		var id = getRoomId(line);
+		if (id !== undefined) {
+			sum += id;
+		}
+	});
+
+	return sum;
+}
+
+function getRoomId(str) {
+	var parts = str.split("-");
+	var tail = parts[parts.length - 1].split("[");
+	var id = parseInt(tail[0]);
+	var checkSum = tail[1].split("]")[0];
+
+	parts.pop();
+	return getCheckSum(parts.join("")).substring(0, checkSum.length) == checkSum ? id : undefined;
+}
+
+function getCheckSum(str) {
+	var alphabet = "abcdefghijklmnopqrstuvwxyz";
+	var charCountersMap = [];
+
+	alphabet.split("").forEach(function(c) {
+		charCountersMap[c] = 0;
+	});
+
+	str.split("").forEach(function(c) {
+		++charCountersMap[c];
+	});
+
+	return asSortedString(charCountersMap);
+}
+
+function asSortedString(charCountersMap) {
+	var charCounters = [];
+	for(var key in charCountersMap) {
+		if (charCountersMap.hasOwnProperty(key)) {
+			charCounters.push([key, charCountersMap[key]]);
+		}
+	}
+
+	charCounters.sort(function(a, b) {
+		return (b[1] == a[1]) ? (a[0] > b[0] ? 1 : -1) : (b[1] - a[1]);
+	});
+
+	var result = "";
+	charCounters.forEach(function(o) {
+		result += o[0];
+	});
+
+	return result;
+}
+
 var input = `bkwzkqsxq-tovvilokx-nozvyiwoxd-172[fstek]
 wifilzof-wbiwifuny-yhachyylcha-526[qrazx]
 jvyyvzpcl-jhukf-shivyhavyf-487[zhtsi]
@@ -980,61 +1038,3 @@ pyknyegle-pyzzgr-pcqcypaf-886[nxvzy]
 zhdsrqlchg-gbh-frqwdlqphqw-361[nqzts]
 kyelcrga-cee-yaosgqgrgml-808[izdqr]
 hplazytkpo-prr-cpnptgtyr-379[prtya]`;
-
-function calc() {
-	var sum = 0;
-
-	input.split("\n").forEach(function(line) {
-		var id = getRoomId(line);
-		if (id !== undefined) {
-			sum += id;
-		}
-	});
-
-	return sum;
-}
-
-function getRoomId(str) {
-	var parts = str.split("-");
-	var tail = parts[parts.length - 1].split("[");
-	var id = parseInt(tail[0]);
-	var checkSum = tail[1].split("]")[0];
-
-	parts.pop();
-	return getCheckSum(parts.join("")).substring(0, checkSum.length) == checkSum ? id : undefined;
-}
-
-function getCheckSum(str) {
-	var alphabet = "abcdefghijklmnopqrstuvwxyz";
-	var charCountersMap = [];
-
-	alphabet.split("").forEach(function(c) {
-		charCountersMap[c] = 0;
-	});
-
-	str.split("").forEach(function(c) {
-		++charCountersMap[c];
-	});
-
-	return asSortedString(charCountersMap);
-}
-
-function asSortedString(charCountersMap) {
-	var charCounters = [];
-	for(var key in charCountersMap) {
-		if (charCountersMap.hasOwnProperty(key)) {
-			charCounters.push([key, charCountersMap[key]]);
-		}
-	}
-
-	charCounters.sort(function(a, b) {
-		return (b[1] == a[1]) ? (a[0] > b[0] ? 1 : -1) : (b[1] - a[1]);
-	});
-
-	var result = "";
-	charCounters.forEach(function(o) {
-		result += o[0];
-	});
-
-	return result;
-}

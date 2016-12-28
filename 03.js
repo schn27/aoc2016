@@ -1,3 +1,28 @@
+"use strict";
+
+function isTriangle(sides) {
+	sides.sort(function(a, b) {
+		return a - b;
+	});
+	return sides[0] + sides[1] > sides[2];
+}
+
+function calc() {
+	var triangles = 0;
+
+	input.split("\n").forEach(function(line){
+		var sidesStr = line.split(" ").filter(function(e){
+			return e && e.length !== 0;
+		});
+
+		if (isTriangle([parseInt(sidesStr[0]), parseInt(sidesStr[1]), parseInt(sidesStr[2])])) {
+			++triangles;
+		}
+	});
+
+	return triangles;
+}
+
 var input = `  775  785  361
   622  375  125
   297  839  375
@@ -1912,26 +1937,3 @@ var input = `  775  785  361
   243   85  734
   696  302  809
   665  375  287`;
-
-function isTriangle(sides) {
-	sides.sort(function(a, b) {
-		return a - b;
-	});
-	return sides[0] + sides[1] > sides[2];
-}
-
-function calc() {
-	var triangles = 0;
-
-	input.split("\n").forEach(function(line){
-		var sidesStr = line.split(" ").filter(function(e){
-			return e && e.length !== 0;
-		});
-
-		if (isTriangle([parseInt(sidesStr[0]), parseInt(sidesStr[1]), parseInt(sidesStr[2])])) {
-			++triangles;
-		}
-	});
-
-	return triangles;
-}
