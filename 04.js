@@ -2,25 +2,35 @@
 
 function calc() {
 	var sum = 0;
+	var northPoleId = null;
 
 	input.split("\n").forEach(function(line) {
-		var id = getRoomId(line);
-		if (id !== undefined) {
-			sum += id;
+		var room = parseRoom(line);
+
+		if (isRoomOk(room)) {
+			sum += room.id;
 		}
+
+		if (getDecodedName(room).indexOf("northpole") >= 0) {
+			northPoleId = room.id;
+		}		
 	});
 
-	return sum;
+	return sum + " " + northPoleId;
 }
 
-function getRoomId(str) {
+function isRoomOk(room) {
+	return getCheckSum(room.name.join("")).substring(0, room.checkSum.length) == room.checkSum;
+}
+
+function parseRoom(str) {
 	var parts = str.split("-");
 	var tail = parts[parts.length - 1].split("[");
 	var id = parseInt(tail[0]);
 	var checkSum = tail[1].split("]")[0];
-
 	parts.pop();
-	return getCheckSum(parts.join("")).substring(0, checkSum.length) == checkSum ? id : undefined;
+	
+	return {name: parts, id: id, checkSum: checkSum};	
 }
 
 function getCheckSum(str) {
@@ -56,6 +66,22 @@ function asSortedString(charCountersMap) {
 	});
 
 	return result;
+}
+
+function getDecodedName(room) {
+	var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+
+	var name = "";
+
+	room.name.forEach(function(part) {
+		part.split("").forEach(function(c) {
+			name += alphabet[(alphabet.indexOf(c) + room.id) % alphabet.length];
+		});
+
+		name += " ";
+	});
+
+	return name;
 }
 
 var input = `bkwzkqsxq-tovvilokx-nozvyiwoxd-172[fstek]

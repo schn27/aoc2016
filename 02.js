@@ -1,37 +1,73 @@
 "use strict";
 
-function calc() {
-	var keyboard = ["123", "456", "789"];
+function calc() { 
+	return getCodeFor([
+			"-----", 
+			"-123-", 
+			"-456-", 
+			"-789-", 
+			"-----"]) +
+		" " + getCodeFor([
+			"-------",
+			"---1---", 
+			"--234--", 
+			"-56789-", 
+			"--ABC--", 
+			"---D---",
+			"-------"]);
+}
 
+function getCodeFor(keyboard) {
 	var code = "";
 
+	var startCoord = getKeyCoord(keyboard, "5");
+
 	input.split("\n").forEach(function(line){
-		var row = 1;
-		var col = 1;
+		var coord = [startCoord[0], startCoord[1]];
 		line.split("").forEach(function(c){
+			var newCoord = [coord[0], coord[1]];
 			switch(c) {
 			case "U":
-				--row;
+				--newCoord[0];
 				break;
 			case "D":
-				++row;
+				++newCoord[0];
 				break;
 			case "L":
-				--col;
+				--newCoord[1];
 				break;
 			case "R":
-				++col;
+				++newCoord[1];
 				break;
 			}
 
-			row = Math.min(Math.max(row, 0), 2);
-			col = Math.min(Math.max(col, 0), 2);
+			if (keyboard[newCoord[0]][newCoord[1]] != "-") {
+				coord = newCoord;
+			}
 		});
 
-		code += keyboard[row][col];
+		code += keyboard[coord[0]][coord[1]];
 	});
 
 	return code;
+}
+
+function getKeyCoord(keyboard, key) {
+	var coord = [0, 0];
+	var res = null;
+
+	keyboard.forEach(function(row) {
+		coord[1] = 0;
+		row.split("").forEach(function(k) {
+			if (k == key) {
+				res = [coord[0], coord[1]];
+			}
+			++coord[1];
+		});
+		++coord[0];
+	});
+
+	return res;
 }
 
 var input = `UUURRRRULRDLRDRRDURDDDLLDLLLULDUDDLDLULUURULRLDLRRLLLRRDRRLDDLLULUDUDDLRDRDUURDLURUURLRULLDDURULRRURDUURLULUUUURDDDDUUDLULRULLLRLLRRRURDLLRLLRRRUURULRDRUUDDDDDLLLRURRURRUURDUURDDRDLULRRLLLDRRRLURRLLURLDRRDDLDLRRLLRDRLLLLDLULDLRRDRRLDDURLULLUDLUDRRDRRLRLULURDRLRLUUUDLRLDLLLURDUDULULDDRUUURLLLDLLDDUDDRURURUDDLUULRDRRRRLDRDDURLUDURDULLDLUDLULDRLRLLRLLLLRURDURLLDRRDRLRUUUUULLLRUDURUDLLLUDLLLLRDLDRDUDRURLUDDUDDURLUUUUDDLLUDLULLLLLDUDLLRLRRDDDULULRLDRLLULDLUDLLURULRDDUURULRDLDLDLRL

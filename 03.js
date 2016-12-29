@@ -1,5 +1,36 @@
 "use strict";
 
+function calc() {
+	var sides = convertInputToArray();
+	return calcHorizontal(sides) + " " + calcVertical(sides);
+}
+
+function calcHorizontal(sides) {
+	var triangles = 0;
+
+	for (var i = 0; i < sides.length; i += 3) {
+		if (isTriangle([sides[i], sides[i + 1], sides[i + 2]])) {
+			++triangles;
+		}
+	}
+
+	return triangles;
+}
+
+function calcVertical(sides) {
+	var triangles = 0;
+
+	for (var i = 0; i < sides.length; i += 9) {
+		for (var j = 0; j < 3; ++j) {
+			if (isTriangle([sides[i + j], sides[i + j + 3], sides[i + j + 6]])) {
+				++triangles;
+			}
+		}
+	}
+
+	return triangles;
+}
+
 function isTriangle(sides) {
 	sides.sort(function(a, b) {
 		return a - b;
@@ -7,20 +38,18 @@ function isTriangle(sides) {
 	return sides[0] + sides[1] > sides[2];
 }
 
-function calc() {
-	var triangles = 0;
+function convertInputToArray() {
+	var sides = [];
 
 	input.split("\n").forEach(function(line){
-		var sidesStr = line.split(" ").filter(function(e){
+		line.split(" ").filter(function(e){
 			return e && e.length !== 0;
+		}).forEach(function(side) {
+			sides.push(parseInt(side));
 		});
-
-		if (isTriangle([parseInt(sidesStr[0]), parseInt(sidesStr[1]), parseInt(sidesStr[2])])) {
-			++triangles;
-		}
 	});
 
-	return triangles;
+	return sides;
 }
 
 var input = `  775  785  361
