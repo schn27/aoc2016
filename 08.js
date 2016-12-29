@@ -7,7 +7,7 @@ function calc() {
 		display.doCommand(line);
 	});
 
-	return display.getNumberOfLitPixels();
+	return display.getNumberOfLitPixels() + "<pre><code>" + display.logPixelsToString() + "</code></pre>";
 }
 
 function Display(width, height) {
@@ -17,6 +17,19 @@ function Display(width, height) {
 		var row = new Array(width);
 		row.fill(0);
 		pixels.push(row);
+	}
+
+	this.logPixelsToString = function() {
+		var res = "";
+		for (var y = 0; y < height; ++y) {
+			/*
+			 * replace all '0' with '.', and '1' with "#" 
+			 * (http://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript)
+			 */
+			res += pixels[y].join("").split("0").join(".").split("1").join("#") + "\n";
+		}
+
+		return res;
 	}
 
 	this.getNumberOfLitPixels = function() {

@@ -2,35 +2,62 @@
 
 function calc() {
 	var tlsSupportedCounter = 0;
+	var sslSupportedCounter = 0;
 
 	input.split("\n").forEach(function(addr) {
 		if (isTlsSupported(addr)) {
 			++tlsSupportedCounter;
 		}
+
+		if (isSslSupported(addr)) {
+			++sslSupportedCounter;
+		}		
 	});
 
-	return tlsSupportedCounter;
+	return tlsSupportedCounter + " " + sslSupportedCounter;
 }
 
 function isTlsSupported(addr) {
 	var parts = addr.split(/[[\]]/);
-	var hasAbba = false;
+	var superNetHasAbba = false;
 	var hyperNetHasAbba = false;
 
 	for (var i = 0, length = parts.length; i < length; ++i) {
 		if ((i & 1) == 0) {
-			hasAbba |= isAbba(parts[i]);
+			superNetHasAbba |= isAbba(parts[i]);
 		} else {
 			hyperNetHasAbba |= isAbba(parts[i]);
 		}
 	}
 
-	return hasAbba & !hyperNetHasAbba;
+	return superNetHasAbba & !hyperNetHasAbba;
+}
+
+function isSslSupported(addr) {
+	var parts = addr.split(/[[\]]/);
+	var superNetAbaList = [];
+	var hyperNetAbaList = [];
+	var found = false;
+
+	for (var i = 0, length = parts.length; i < length; ++i) {
+		if ((i & 1) == 0) {
+			superNetAbaList = superNetAbaList.concat(getAbaList(parts[i]));
+		} else {
+			hyperNetAbaList = hyperNetAbaList.concat(getAbaList(parts[i]));
+		}
+	}
+
+	hyperNetAbaList.forEach(function(hyperBab) {
+		var hyperAba = getBabForAba(hyperBab);
+		found |= superNetAbaList.indexOf(hyperAba) >= 0;
+	});
+
+	return found;
 }
 
 function isAbba(str) {
-	for (var i = 0, length = str.length - 4; i < length; ++i) {
-		if (str[i] == str[i + 3] && str[i + 1] == str[i + 2]) {
+	for (var i = 0, length = str.length - 3; i < length; ++i) {
+		if ((str[i] == str[i + 3]) && (str[i + 1] == str[i + 2]) && (str[i] != str[i + 1])) {
 			return true;
 		}
 	}
@@ -38,6 +65,21 @@ function isAbba(str) {
 	return false;
 }
 
+function getAbaList(str) {
+	var abaList = [];
+
+	for (var i = 0, length = str.length - 2; i < length; ++i) {
+		if (str[i] == str[i + 2] && str[i] != str[i + 1]) {
+			abaList.push(str.substring(i, i + 3));
+		}
+	}
+
+	return abaList;
+}
+
+function getBabForAba(str) {
+	return str[1] + str[0] + str[1];
+}
 
 var input = `dnwtsgywerfamfv[gwrhdujbiowtcirq]bjbhmuxdcasenlctwgh
 rnqfzoisbqxbdlkgfh[lwlybvcsiupwnsyiljz]kmbgyaptjcsvwcltrdx[ntrpwgkrfeljpye]jxjdlgtntpljxaojufe

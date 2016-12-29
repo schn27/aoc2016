@@ -1,7 +1,6 @@
 "use strict";
 
 function calc() {
-	var message = "";
 	var charCounters = [];
 
 	input.split("\n").forEach(function(line) {
@@ -20,6 +19,9 @@ function calc() {
 		}
 	});
 
+	var message = "";
+	var message2 = "";
+
 	charCounters.forEach(function(o) {
 		var counters = [];
 		for (var key in o) {
@@ -33,10 +35,17 @@ function calc() {
 		});
 
 		message += counters[0][0];
+
+		counters.sort(function(a, b) {
+			return a[1] - b[1];
+		});
+
+		message2 += counters[0][0];
+
 	});
 
 
-	return message;
+	return message + " " + message2;
 }
 
 

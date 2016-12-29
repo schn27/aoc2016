@@ -5,19 +5,30 @@
 
 function calc() {
 	var password = "";
+	var password2 = "        ";
 
-	for (var i = 0; ; ++i) {
+	for (var i = 0, end = false; !end; ++i) {
 		var hash = md5(input + i);
 		if (hash.substring(0, 5) == "00000") {
-			password += hash.substring(5, 6);
-			console.log(i + ": \'" + password + "\'");
-			if (password.length == 8) {
-				break;
+			var c6 = hash.substring(5, 6);
+			var c7 = hash.substring(6, 7);
+
+			if (password.length < 8) {
+				password += c6;
+				console.log(i + ": password1 = '" + password + "'");
+			}
+
+			var pos = +c6;
+
+			if (pos >= 0 && pos < 8 && password2[pos] == " ") {
+				password2 = password2.substring(0, pos) + c7 + password2.substring(pos + 1);
+				end = password2.indexOf(" ") < 0;
+				console.log(i + ": password2 = '" + password2 + "'");
 			}
 		}
 	}
 
-	return password;
+	return password + " " + password2;
 }
 
 var input = "ugkcyxxp";
