@@ -41,8 +41,8 @@ function isTriangle(sides) {
 function convertInputToArray() {
 	var sides = [];
 
-	input.split("\n").forEach(function(line){
-		line.split(" ").filter(function(e){
+	input.split("\n").forEach(function(line) {
+		line.split(" ").filter(function(e) {
 			return e && e.length !== 0;
 		}).forEach(function(side) {
 			sides.push(parseInt(side));
