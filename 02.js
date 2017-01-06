@@ -22,31 +22,31 @@ function getCodeFor(keyboard) {
 
 	var startCoord = getKeyCoord(keyboard, "5");
 
-	input.split("\n").forEach(function(line){
-		var coord = [startCoord[0], startCoord[1]];
-		line.split("").forEach(function(c){
-			var newCoord = [coord[0], coord[1]];
+	input.split("\n").forEach(function(line) {
+		var coord = startCoord.slice();
+		line.split("").forEach(function(c) {
+			var newCoord = coord.slice();
 			switch(c) {
 			case "U":
-				--newCoord[0];
-				break;
-			case "D":
-				++newCoord[0];
-				break;
-			case "L":
 				--newCoord[1];
 				break;
-			case "R":
+			case "D":
 				++newCoord[1];
+				break;
+			case "L":
+				--newCoord[0];
+				break;
+			case "R":
+				++newCoord[0];
 				break;
 			}
 
-			if (keyboard[newCoord[0]][newCoord[1]] != "-") {
+			if (keyboard[newCoord[1]][newCoord[0]] != "-") {
 				coord = newCoord;
 			}
 		});
 
-		code += keyboard[coord[0]][coord[1]];
+		code += keyboard[coord[1]][coord[0]];
 	});
 
 	return code;
@@ -57,14 +57,14 @@ function getKeyCoord(keyboard, key) {
 	var res = null;
 
 	keyboard.forEach(function(row) {
-		coord[1] = 0;
+		coord[0] = 0;
 		row.split("").forEach(function(k) {
 			if (k == key) {
-				res = [coord[0], coord[1]];
+				res = coord.slice();
 			}
-			++coord[1];
+			++coord[0];
 		});
-		++coord[0];
+		++coord[1];
 	});
 
 	return res;
