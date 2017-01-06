@@ -15,9 +15,9 @@ function calc() {
 			coords = move(coords, heading, 1);
 			
 			if (bunnyCoords == null) {
-				var key = coords[0] + ":" + coords[1];
+				var key = coords.join(":");
 				if (track[key] !== undefined) {
-					bunnyCoords = [coords[0], coords[1]];
+					bunnyCoords = coords.slice();
 				} else {
 					track[key] = 1;
 				}
@@ -51,7 +51,7 @@ function turn(heading, turn) {
 }
 
 function move(coords, heading, distance) {
-	var newCoords = [coords[0], coords[1]];
+	var newCoords = coords.slice();
 
 	switch (heading) {
 	case 0:
