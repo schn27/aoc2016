@@ -18,28 +18,14 @@ function calc() {
 }
 
 function getCodeFor(keyboard) {
-	var code = "";
-
+	var moves = {"U": [0, -1], "D": [0, 1], "L": [-1, 0], "R": [1, 0]};
 	var startCoord = getKeyCoord(keyboard, "5");
+	var code = "";
 
 	input.split("\n").forEach(function(line) {
 		var coord = startCoord.slice();
 		line.split("").forEach(function(c) {
-			var newCoord = coord.slice();
-			switch(c) {
-			case "U":
-				--newCoord[1];
-				break;
-			case "D":
-				++newCoord[1];
-				break;
-			case "L":
-				--newCoord[0];
-				break;
-			case "R":
-				++newCoord[0];
-				break;
-			}
+			var newCoord = [coord[0] + moves[c][0], coord[1] + moves[c][1]];
 
 			if (keyboard[newCoord[1]][newCoord[0]] != "-") {
 				coord = newCoord;
