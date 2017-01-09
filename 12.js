@@ -70,7 +70,7 @@ function Cpu(programText) {
 
 	function doJnz(operand, operand2) {
 		if (getValue(operand) != 0) {
-			registers["pc"] += parseInt(operand2, 10);
+			registers["pc"] += getValue(operand2);
 		} else {
 			++registers["pc"];
 		}
