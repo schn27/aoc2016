@@ -1,13 +1,16 @@
 "use strict";
 
 function calc() {
-	
-	for (var a = 0; a < 10000; ++a) {
-		var cpu = new Cpu(input, "0101");
-		cpu.setRegisterValue("a", 0);
+	var pattern = "0101010101010101010101010101010101010101010101010101010101010101";
+
+	for (var a = 0; ; ++a) {
+		var cpu = new Cpu(input, pattern);
+		cpu.setRegisterValue("a", a);
 		cpu.execute();
 
-		console.log(a + " " + cpu.getOutput());
+		if (cpu.getOutput().join("") == pattern) {
+			return a;
+		}
 	}
 
 	return null;
@@ -27,8 +30,7 @@ function Cpu(programText, outputPattern) {
 	var output = [];
 
 	this.execute = function() {
-		while ((registers["pc"] < program.length) 
-				&& (output.length < outputPattern.length && outputPattern.slice(0, output.length) == output.join(""))) {
+		while ((registers["pc"] < program.length) && checkOutput()) {
 			var command = program[registers["pc"]];
 
 			switch (command.operation) {
@@ -143,6 +145,10 @@ function Cpu(programText, outputPattern) {
 
 	function getValue(operand) {
 		return (operand in registers) ? registers[operand] : parseInt(operand, 10);
+	}
+
+	function checkOutput() {
+		return (output.length < outputPattern.length) && (outputPattern.slice(0, output.length) == output.join(""));
 	}
 
 	function parseProgramText(text) {
