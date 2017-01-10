@@ -19,19 +19,13 @@ function calc() {
 function Cpu(programText, outputPattern) {
 	var program = parseProgramText(programText);
 
-	var registers = [];
-
-	registers["pc"] = 0;
-	registers["a"] = 0;
-	registers["b"] = 0;
-	registers["c"] = 0;
-	registers["d"] = 0;
+	var registers = {pc: 0, a: 0, b: 0, c: 0, d: 0};
 
 	var output = [];
 
 	this.execute = function() {
-		while ((registers["pc"] < program.length) && checkOutput()) {
-			var command = program[registers["pc"]];
+		while ((registers.pc < program.length) && checkOutput()) {
+			var command = program[registers.pc];
 
 			switch (command.operation) {
 			case "cpy":
@@ -75,7 +69,7 @@ function Cpu(programText, outputPattern) {
 			registers[operand2] = getValue(operand);
 		}
 
-		++registers["pc"];
+		++registers.pc;
 	}
 
 	function doInc(operand) {
@@ -83,7 +77,7 @@ function Cpu(programText, outputPattern) {
 			++registers[operand];
 		}
 
-		++registers["pc"];
+		++registers.pc;
 	}
 
 	function doDec(operand) {
@@ -91,19 +85,19 @@ function Cpu(programText, outputPattern) {
 			--registers[operand];
 		}
 
-		++registers["pc"];
+		++registers.pc;
 	}
 
 	function doJnz(operand, operand2) {
 		if (getValue(operand) != 0) {
-			registers["pc"] += getValue(operand2);
+			registers.pc += getValue(operand2);
 		} else {
-			++registers["pc"];
+			++registers.pc;
 		}
 	}
 
 	function doTgl(operand) {
-		var addr = registers["pc"] + getValue(operand);
+		var addr = registers.pc + getValue(operand);
 
 		if (addr >= 0 && addr < program.length) {
 			var command = program[addr];
@@ -131,16 +125,16 @@ function Cpu(programText, outputPattern) {
 			program[addr] = command;
 		}
 
-		++registers["pc"];
+		++registers.pc;
 	}
 
 	function doOut(operand) {
 		output.push(getValue(operand));
-		++registers["pc"];
+		++registers.pc;
 	}
 
 	function doNop() {
-		++registers["pc"];
+		++registers.pc;
 	}
 
 	function getValue(operand) {
@@ -156,11 +150,7 @@ function Cpu(programText, outputPattern) {
 
 		text.split("\n").forEach(function(line) {
 			var command = line.split(" ");
-			code.push({
-				operation: command[0],
-				operand: command[1],
-				operand2: command[2]
-			});
+			code.push({operation: command[0], operand: command[1], operand2: command[2]});
 		});
 
 		return code;
