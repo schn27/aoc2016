@@ -3,9 +3,8 @@
 function calc() {
 	var grid = parseInput();
 
-	return grid.join("<br>");
-
-	//return getViablePairs(grid) + " " + getStepsForDataTransfer(grid, [grid.length - 1, 0], [0, 0]);
+	//TODO: not completed!
+	return getViablePairs(grid) + "<br>" + grid.join("<br>");//getStepsForDataTransfer(grid, [grid.length - 1, 0], [0, 0]);
 }
 
 function getStepsForDataTransfer(grid, src, dst) {
@@ -22,7 +21,7 @@ function getViablePairs(grid) {
 	var viablePairs = 0;
 
 	for (var i = 0; i < list.length - 1; ++i) {
-		for (var j = i; j < list.length; ++j) {
+		for (var j = i + 1; j < list.length; ++j) {
 			if ((list[i].used != 0) && (list[j].used + list[i].used <= list[j].size)) {
 				++viablePairs;
 			}

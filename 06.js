@@ -4,7 +4,7 @@ function calc() {
 	var charCounters = [];
 
 	input.split("\n").forEach(function(line) {
-		for (var i = 0, length = line.length; i < length; ++i) {
+		for (var i = 0; i < line.length; ++i) {
 			if (charCounters[i] == undefined) {
 				charCounters[i] = [];
 			}

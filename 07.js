@@ -22,7 +22,7 @@ function isTlsSupported(addr) {
 	var superNetHasAbba = false;
 	var hyperNetHasAbba = false;
 
-	for (var i = 0, length = parts.length; i < length; ++i) {
+	for (var i = 0; i < parts.length; ++i) {
 		if ((i & 1) == 0) {
 			superNetHasAbba |= isAbba(parts[i]);
 		} else {
@@ -39,7 +39,7 @@ function isSslSupported(addr) {
 	var hyperNetAbaList = [];
 	var found = false;
 
-	for (var i = 0, length = parts.length; i < length; ++i) {
+	for (var i = 0; i < parts.length; ++i) {
 		if ((i & 1) == 0) {
 			superNetAbaList = superNetAbaList.concat(getAbaList(parts[i]));
 		} else {
@@ -56,7 +56,7 @@ function isSslSupported(addr) {
 }
 
 function isAbba(str) {
-	for (var i = 0, length = str.length - 3; i < length; ++i) {
+	for (var i = 0; i < str.length - 3; ++i) {
 		if ((str[i] == str[i + 3]) && (str[i + 1] == str[i + 2]) && (str[i] != str[i + 1])) {
 			return true;
 		}
@@ -68,9 +68,9 @@ function isAbba(str) {
 function getAbaList(str) {
 	var abaList = [];
 
-	for (var i = 0, length = str.length - 2; i < length; ++i) {
+	for (var i = 0; i < str.length - 2; ++i) {
 		if (str[i] == str[i + 2] && str[i] != str[i + 1]) {
-			abaList.push(str.substring(i, i + 3));
+			abaList.push(str.slice(i, i + 3));
 		}
 	}
 

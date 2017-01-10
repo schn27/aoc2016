@@ -20,13 +20,13 @@ function calc() {
 }
 
 function isRoomOk(room) {
-	return getCheckSum(room.name.join("")).substring(0, room.checkSum.length) == room.checkSum;
+	return getCheckSum(room.name.join("")).slice(0, room.checkSum.length) == room.checkSum;
 }
 
 function parseRoom(str) {
 	var parts = str.split("-");
 	var tail = parts[parts.length - 1].split("[");
-	var id = parseInt(tail[0]);
+	var id = +tail[0];
 	var checkSum = tail[1].split("]")[0];
 	parts.pop();
 	

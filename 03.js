@@ -45,7 +45,7 @@ function convertInputToArray() {
 		line.split(" ").filter(function(e) {
 			return e && e.length !== 0;
 		}).forEach(function(side) {
-			sides.push(parseInt(side));
+			sides.push(+side);
 		});
 	});
 

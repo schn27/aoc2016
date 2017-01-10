@@ -147,11 +147,7 @@ function Column(description) {
 					type = type.split("-")[0];
 				}
 
-				floors[floor].push({
-					type: type,
-					device: device,
-					toString: function() {return this.type + " " + this.device;}
-				});
+				floors[floor].push({type: type, device: device});
 
 				i += 2;
 			}

@@ -9,14 +9,14 @@ function calc() {
 	track["0:0"] = 1;
 
 	input.split(", ").forEach(function(command) {
-		heading = turn(heading, command.substring(0, 1));
+		heading = turn(heading, command.slice(0, 1));
 		
-		for (var i = parseInt(command.substring(1)); i > 0; --i) {
+		for (var i = +command.slice(1); i > 0; --i) {
 			coords = move(coords, heading);
 			
 			if (bunnyCoords == null) {
 				var key = coords.join(":");
-				if (track[key] !== undefined) {
+				if (track[key] != undefined) {
 					bunnyCoords = coords.slice();
 				} else {
 					track[key] = 1;

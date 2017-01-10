@@ -11,9 +11,8 @@ function calc() {
 		maze.push(line);
 	}
 
-	var wave = waveAlgorithm(destination, source, maze);
-
-	var wave2 = waveAlgorithm(source, [1, 0], maze, 51);	// [1, 0] will be always a wall
+	var wave = waveAlgorithm(source, destination, maze);
+	var wave2 = waveAlgorithm([1, 0], source, maze, 51);	// [1, 0] will be always a wall
 	var locations = 0;
 	
 	for (var y = 0; y < 100; ++y) {
@@ -27,8 +26,10 @@ function calc() {
 	return getSteps(source, wave) + " " + locations;
 }
 
-function waveAlgorithm(destination, source, maze, stageLimit) {
+function waveAlgorithm(source, destination, maze, stageLimit) {
+	var moves = [[0, -1], [0, 1], [-1, 0], [1, 0]];
 	var wave = [];
+
 	for (var y = 0; y < maze.length; ++y) {
 		wave.push(new Array(maze[y].length));
 	}
@@ -39,18 +40,11 @@ function waveAlgorithm(destination, source, maze, stageLimit) {
 		for (var y = 0; y < wave.length; ++y) {
 			for (var x = 0; x < wave[y].length; ++x) {
 				if (wave[y][x] == stage - 1) {
-					if ((maze[y - 1][x] == ".") && (wave[y - 1][x] == undefined)) {
-						wave[y - 1][x] = stage;
-					}
-					if ((maze[y + 1][x] == ".") && (wave[y + 1][x] == undefined)) {
-						wave[y + 1][x] = stage;
-					}
-					if ((maze[y][x - 1] == ".") && (wave[y][x - 1] == undefined)) {
-						wave[y][x - 1] = stage;
-					}
-					if ((maze[y][x + 1] == ".") && (wave[y][x + 1] == undefined)) {
-						wave[y][x + 1] = stage;
-					}
+					moves.forEach(function(move) {
+						if ((maze[y + move[1]][x + move[0]] == ".") && (wave[y + move[1]][x + move[0]] == undefined)) {
+							wave[y + move[1]][x + move[0]] = stage;
+						}
+					});
 				}
 			}
 		}
@@ -60,6 +54,7 @@ function waveAlgorithm(destination, source, maze, stageLimit) {
 }
 
 function getSteps(source, wave) {
+	var moves = [[0, -1], [0, 1], [-1, 0], [1, 0]];
 	var steps = 0;
 	var coord = source.slice();
 
@@ -70,14 +65,12 @@ function getSteps(source, wave) {
 			return steps;
 		}
 
-		if (wave[coord[1] - 1][coord[0]] == stage - 1) {
-			--coord[1];
-		} else if (wave[coord[1] + 1][coord[0]] == stage - 1) {
-			++coord[1];
-		} else if (wave[coord[1]][coord[0] - 1] == stage - 1) {
-			--coord[0];
-		} else if (wave[coord[1]][coord[0] + 1] == stage - 1) {
-			++coord[0];
+		for (var i = 0; i < moves.length; ++i) {
+			if (wave[coord[1] + moves[i][1]][coord[0] + moves[i][0]] == stage - 1) {
+				coord[0] += moves[i][0];
+				coord[1] += moves[i][1];
+				break;
+			}
 		}
 
 		++steps;

@@ -7,18 +7,18 @@ function calc() {
 function getDecompressedLength(compressed, recursive) {
 	var decompressedLength = 0;
 
-	for (var position = 0, length = compressed.length; position < length; /**/) {
+	for (var position = 0; position < compressed.length; /**/) {
 		var markerStart = compressed.indexOf("(", position);
 
 		if (markerStart < 0) {
 			decompressedLength += length - position;
-			break;
+			position = compressed.length;
 		} else {
 			decompressedLength += markerStart - position;
 			var markerEnd = compressed.indexOf(")", markerStart);
-			var markerArgs = compressed.substring(markerStart + 1, markerEnd).split("x");
+			var markerArgs = compressed.slice(markerStart + 1, markerEnd).split("x");
 			var dataLength = +markerArgs[0];
-			var data = compressed.substring(markerEnd + 1, markerEnd + 1 + dataLength);
+			var data = compressed.slice(markerEnd + 1, markerEnd + 1 + dataLength);
 			decompressedLength += (+markerArgs[1]) * (recursive && data.indexOf("(") >= 0 ? getDecompressedLength(data, true) : dataLength);
 			position = markerEnd + 1 + dataLength;
 		}
