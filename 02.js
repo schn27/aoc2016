@@ -2,58 +2,47 @@
 
 function calc() { 
 	return getCodeFor([
-			"-----", 
-			"-123-", 
-			"-456-", 
-			"-789-", 
-			"-----"]) +
+			"123", 
+			"456", 
+			"789"]) +
 		" " + getCodeFor([
-			"-------",
-			"---1---", 
-			"--234--", 
-			"-56789-", 
-			"--ABC--", 
-			"---D---",
-			"-------"]);
+			"--1--", 
+			"-234-", 
+			"56789", 
+			"-ABC-", 
+			"--D--"]);
 }
 
 function getCodeFor(keyboard) {
 	var moves = {"U": [0, -1], "D": [0, 1], "L": [-1, 0], "R": [1, 0]};
-	var startCoord = getKeyCoord(keyboard, "5");
-	var code = "";
+	var coord = getKeyCoord(keyboard, "5");
+	var code = [];
 
 	input.split("\n").forEach(function(line) {
-		var coord = startCoord.slice();
 		line.split("").forEach(function(c) {
-			var newCoord = [coord[0] + moves[c][0], coord[1] + moves[c][1]];
+			var x = Math.min(Math.max(coord[0] + moves[c][0], 0), keyboard[0].length - 1);
+			var y = Math.min(Math.max(coord[1] + moves[c][1], 0), keyboard.length - 1);
 
-			if (keyboard[newCoord[1]][newCoord[0]] != "-") {
-				coord = newCoord;
+			if (keyboard[y][x] != "-") {
+				coord = [x, y];
 			}
 		});
 
-		code += keyboard[coord[1]][coord[0]];
+		code.push(keyboard[coord[1]][coord[0]]);
 	});
 
-	return code;
+	return code.join("");
 }
 
 function getKeyCoord(keyboard, key) {
-	var coord = [0, 0];
-	var res = null;
+	for (var y = 0; y < keyboard.length; ++y) {
+		var x = keyboard[y].indexOf(key);
+		if (x >= 0) {
+			return [x, y];
+		}
+	}
 
-	keyboard.forEach(function(row) {
-		coord[0] = 0;
-		row.split("").forEach(function(k) {
-			if (k == key) {
-				res = coord.slice();
-			}
-			++coord[0];
-		});
-		++coord[1];
-	});
-
-	return res;
+	throw new Error("Can't find key: " + key);
 }
 
 var input = `UUURRRRULRDLRDRRDURDDDLLDLLLULDUDDLDLULUURULRLDLRRLLLRRDRRLDDLLULUDUDDLRDRDUURDLURUURLRULLDDURULRRURDUURLULUUUURDDDDUUDLULRULLLRLLRRRURDLLRLLRRRUURULRDRUUDDDDDLLLRURRURRUURDUURDDRDLULRRLLLDRRRLURRLLURLDRRDDLDLRRLLRDRLLLLDLULDLRRDRRLDDURLULLUDLUDRRDRRLRLULURDRLRLUUUDLRLDLLLURDUDULULDDRUUURLLLDLLDDUDDRURURUDDLUULRDRRRRLDRDDURLUDURDULLDLUDLULDRLRLLRLLLLRURDURLLDRRDRLRUUUUULLLRUDURUDLLLUDLLLLRDLDRDUDRURLUDDUDDURLUUUUDDLLUDLULLLLLDUDLLRLRRDDDULULRLDRLLULDLUDLLURULRDDUURULRDLDLDLRL

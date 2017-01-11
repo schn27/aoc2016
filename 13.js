@@ -2,31 +2,33 @@
 
 function calc() {
 	var maze = [];
+	var mazeWidth = destination[0] * 2;
+	var mazeHeight = destination[1] * 2;
 
-	for (var y = 0; y < 100; ++y) {
+	for (var y = 0; y < mazeHeight; ++y) {
 		var line = [];
-		for (var x = 0; x < 100; ++x) {
+		for (var x = 0; x < mazeWidth; ++x) {
 			line.push(getMazeXY(x, y, input) ? "#" : ".");
 		}
 		maze.push(line);
 	}
 
-	var wave = waveAlgorithm(source, destination, maze);
-	var wave2 = waveAlgorithm([1, 0], source, maze, 51);	// [1, 0] will be always a wall
+	var wave = getWave(source, destination, maze);
+	var wave2 = getWave([1, 0], source, maze, stepLimit + 1);	// [1, 0] will be always a wall
 	var locations = 0;
 	
-	for (var y = 0; y < 100; ++y) {
-		for (var x = 0; x < 100; ++x) {
+	for (var y = 0; y < wave2.length; ++y) {
+		for (var x = 0; x < wave2[0].length; ++x) {
 			if (wave2[y][x] != undefined) {
 				++locations;
 			}
 		}
 	}
 
-	return getSteps(source, wave) + " " + locations;
+	return wave[source[1]][source[0]] + " " + locations;
 }
 
-function waveAlgorithm(source, destination, maze, stageLimit) {
+function getWave(source, destination, maze, stepLimit) {
 	var moves = [[0, -1], [0, 1], [-1, 0], [1, 0]];
 	var wave = [];
 
@@ -36,13 +38,13 @@ function waveAlgorithm(source, destination, maze, stageLimit) {
 
 	wave[destination[1]][destination[0]] = 0;
 
-	for (var stage = 1; (wave[source[1]][source[0]] == undefined) && (stageLimit == undefined || stage < stageLimit); ++stage) {
+	for (var step = 1; (wave[source[1]][source[0]] == undefined) && (stepLimit == undefined || step < stepLimit); ++step) {
 		for (var y = 0; y < wave.length; ++y) {
 			for (var x = 0; x < wave[y].length; ++x) {
-				if (wave[y][x] == stage - 1) {
+				if (wave[y][x] == step - 1) {
 					moves.forEach(function(move) {
 						if ((maze[y + move[1]][x + move[0]] == ".") && (wave[y + move[1]][x + move[0]] == undefined)) {
-							wave[y + move[1]][x + move[0]] = stage;
+							wave[y + move[1]][x + move[0]] = step;
 						}
 					});
 				}
@@ -51,30 +53,6 @@ function waveAlgorithm(source, destination, maze, stageLimit) {
 	}
 
 	return wave;
-}
-
-function getSteps(source, wave) {
-	var moves = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-	var steps = 0;
-	var coord = source.slice();
-
-	for (;;) {
-		var stage = wave[coord[1]][coord[0]];
-		
-		if (stage == 0) {
-			return steps;
-		}
-
-		for (var i = 0; i < moves.length; ++i) {
-			if (wave[coord[1] + moves[i][1]][coord[0] + moves[i][0]] == stage - 1) {
-				coord[0] += moves[i][0];
-				coord[1] += moves[i][1];
-				break;
-			}
-		}
-
-		++steps;
-	}
 }
 
 function getMazeXY(x, y, c) {
@@ -93,3 +71,4 @@ function getParity32(value) {
 var source = [1, 1];
 var destination = [31, 39];
 var input = 1364;
+var stepLimit = 50;

@@ -74,13 +74,13 @@ function getWaveSteps(src, dst, maze) {
 
 	var moves = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
-	for (var stage = 1; wave[src[1]][src[0]] == undefined; ++stage) {
+	for (var step = 1; wave[src[1]][src[0]] == undefined; ++step) {
 		for (var y = 0; y < wave.length; ++y) {
 			for (var x = 0; x < wave[y].length; ++x) {
-				if (wave[y][x] == stage - 1) {
+				if (wave[y][x] == step - 1) {
 					moves.forEach(function(move) {
 						if ((maze[y + move[1]][x + move[0]] == ".") && (wave[y + move[1]][x + move[0]] == undefined)) {
-							wave[y + move[1]][x + move[0]] = stage;
+							wave[y + move[1]][x + move[0]] = step;
 						}						
 					});
 				}
@@ -88,22 +88,7 @@ function getWaveSteps(src, dst, maze) {
 		}
 	}
 
-	var steps = 0;
-	var coord = src.slice();
-
-	for (var stage = wave[coord[1]][coord[0]]; stage != 0; stage = wave[coord[1]][coord[0]]) {
-		for (var i = 0; i < moves.length; ++i) {
-			if (wave[coord[1] + moves[i][1]][coord[0] + moves[i][0]] == stage - 1) {
-				coord[0] += moves[i][0];
-				coord[1] += moves[i][1];
-				break;
-			}
-		}
-
-		++steps;
-	}
-
-	return steps;
+	return step - 1;
 }
 
 // http://stackoverflow.com/questions/7918806/finding-n-th-permutation-without-computing-others/24257996#24257996
