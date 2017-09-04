@@ -17,16 +17,9 @@ function calc() {
 function BotProcessor(alarmedValues) {
 	var bots = [];
 	var output = [];
+	var alarmedBotNumber = null;
 
 	this.getAlarmedBot = function() {
-		var alarmedBotNumber = null;
-
-		for (var botNumber in bots) {
-			if (bots[botNumber].alarmed == 3) {
-				alarmedBotNumber = botNumber;
-			}
-		}
-
 		return alarmedBotNumber;
 	}
 
@@ -79,15 +72,11 @@ function BotProcessor(alarmedValues) {
 
 		bot.values.push(value);
 
-		if (value == alarmedValues[0]) {
-			bot.alarmed |= 1;
-		} 
-
-		if (value == alarmedValues[1]) {
-			bot.alarmed |= 2;
-		}
-
 		if (bot.values.length == 2) {
+			if (alarmedValues.indexOf(bot.values[0]) != -1 && alarmedValues.indexOf(bot.values[1]) != -1) {
+				alarmedBotNumber = botNumber;
+			}
+
 			var values = bot.values.sort(function(a, b) {
 				return a - b;
 			});
@@ -142,7 +131,6 @@ function BotProcessor(alarmedValues) {
 			lowTo: lowTo, 
 			highTo: highTo,
 			values: [],
-			alarmed: 0
 		};
 	}
 }
