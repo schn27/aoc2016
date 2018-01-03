@@ -1,96 +1,50 @@
 "use strict";
 
 function calc() {
-	var cpu = new Cpu(input);
+	const program = input.split("\n").map(line => line.split(" "));
+
+	let cpu = new Cpu(program);
 	cpu.execute();
 
-	var cpu2 = new Cpu(input);
+	let cpu2 = new Cpu(program);
 	cpu2.setRegisterValue("c", 1);
 	cpu2.execute();
 
 	return cpu.getRegisterValue("a") + " " + cpu2.getRegisterValue("a");
 }
 
-function Cpu(programText) {
-	var program = parseProgramText(programText);
+function Cpu(program) {
+	let registers = {pc: 0, a: 0, b: 0, c: 0, d: 0};
 
-	var registers = {pc: 0, a: 0, b: 0, c: 0, d: 0};
-
-	this.execute = function() {
+	this.execute = () => {
 		while (registers.pc < program.length) {
-			var command = program[registers.pc];
+			let cmd = program[registers.pc];
 
-			switch (command.operation) {
-			case "cpy":
-				doCpy(command.operand, command.operand2);
-				break;
-			case "inc":
-				doInc(command.operand);
-				break;
-			case "dec":
-				doDec(command.operand);
-				break;
-			case "jnz":
-				doJnz(command.operand, command.operand2);
-				break;
-			default:
-				doNop();
+			if (cmd[0] === "cpy") {
+				registers[cmd[2]] = getValue(cmd[1]);
+			} else if (cmd[0] === "inc") {
+				++registers[cmd[1]];
+			} else if (cmd[0] === "dec") {
+				--registers[cmd[1]];
+			} else if (cmd[0] === "jnz") {
+				if (getValue(cmd[1]) != 0) {
+					registers.pc += getValue(cmd[2]) - 1;
+				}
 			}
-		}
-	}
 
-	this.getRegisterValue = function(registerName) {
-		return registers[registerName];
-	}
-
-	this.setRegisterValue = function(registerName, value) {
-		registers[registerName] = value;
-	}
-
-	function doCpy(operand, operand2) {
-		registers[operand2] = getValue(operand);
-		++registers.pc;
-	}
-
-	function doInc(operand) {
-		++registers[operand];
-		++registers.pc;
-	}
-
-	function doDec(operand) {
-		--registers[operand];
-		++registers.pc;
-	}
-
-	function doJnz(operand, operand2) {
-		if (getValue(operand) != 0) {
-			registers.pc += getValue(operand2);
-		} else {
 			++registers.pc;
 		}
 	}
 
-	function doNop() {
-		++registers.pc;
-	}
+	this.getRegisterValue = (reg) => registers[reg];
+	this.setRegisterValue = (reg, value) => registers[reg] = value;
 
 	function getValue(operand) {
-		return (operand in registers) ? registers[operand] : parseInt(operand, 10);
-	}
-
-	function parseProgramText(text) {
-		var code = [];
-
-		text.split("\n").forEach(function(line) {
-			var command = line.split(" ");
-			code.push({operation: command[0], operand: command[1], operand2: command[2]});
-		});
-
-		return code;
+		return (operand in registers) ? registers[operand] : +operand;
 	}
 }
 
-var input = `cpy 1 a
+const input = `cpy 1 a
 cpy 1 b
 cpy 26 d
 jnz c 2

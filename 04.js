@@ -1,11 +1,11 @@
 "use strict";
 
 function calc() {
-	var sum = 0;
-	var northPoleId = null;
+	let sum = 0;
+	let northPoleId = null;
 
-	input.split("\n").forEach(function(line) {
-		var room = parseRoom(line);
+	input.split("\n").forEach(line => {
+		let room = parseRoom(line);
 
 		if (isRoomOk(room)) {
 			sum += room.id;
@@ -20,71 +20,44 @@ function calc() {
 }
 
 function isRoomOk(room) {
-	return getCheckSum(room.name.join("")).slice(0, room.checkSum.length) == room.checkSum;
+	return getCheckSum(room.name.join("")).slice(0, room.checkSum.length) === room.checkSum;
 }
 
 function parseRoom(str) {
-	var parts = str.split("-");
-	var tail = parts[parts.length - 1].split("[");
-	var id = +tail[0];
-	var checkSum = tail[1].split("]")[0];
+	let parts = str.split("-");
+	let tail = parts[parts.length - 1].split("[");
+	let id = +tail[0];
+	let checkSum = tail[1].split("]")[0];
 	parts.pop();
 	
-	return {name: parts, id: id, checkSum: checkSum};	
+	return {name: parts, id, checkSum};
 }
 
 function getCheckSum(str) {
-	var alphabet = "abcdefghijklmnopqrstuvwxyz";
-	var charCountersMap = [];
+	let charCountersMap = "abcdefghijklmnopqrstuvwxyz".split("")
+		.reduce((s, c) => ((s[c] = 0), s), {});
 
-	alphabet.split("").forEach(function(c) {
-		charCountersMap[c] = 0;
-	});
-
-	str.split("").forEach(function(c) {
-		++charCountersMap[c];
-	});
+	str.split("").forEach(c => ++charCountersMap[c]);
 
 	return asSortedString(charCountersMap);
 }
 
 function asSortedString(charCountersMap) {
-	var charCounters = [];
-	for(var key in charCountersMap) {
-		if (charCountersMap.hasOwnProperty(key)) {
-			charCounters.push([key, charCountersMap[key]]);
-		}
-	}
-
-	charCounters.sort(function(a, b) {
-		return (b[1] == a[1]) ? (a[0] > b[0] ? 1 : -1) : (b[1] - a[1]);
-	});
-
-	var result = "";
-	charCounters.forEach(function(o) {
-		result += o[0];
-	});
-
-	return result;
+	return Object.keys(charCountersMap)
+		.map(key => [key, charCountersMap[key]])
+		.sort((a, b) => (b[1] == a[1]) ? (a[0] > b[0] ? 1 : -1) : (b[1] - a[1]))
+		.reduce((s, o) => s + o[0], "");
 }
 
 function getDecodedName(room) {
-	var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+	const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+	const decode = c => alphabet[(alphabet.indexOf(c) + room.id) % alphabet.length];
 
-	var name = "";
-
-	room.name.forEach(function(part) {
-		part.split("").forEach(function(c) {
-			name += alphabet[(alphabet.indexOf(c) + room.id) % alphabet.length];
-		});
-
-		name += " ";
-	});
-
-	return name;
+	return room.name.reduce((name, part) => 
+		name + part.split("").reduce((s, c) => s + decode(c), "") + " ", "");
 }
 
-var input = `bkwzkqsxq-tovvilokx-nozvyiwoxd-172[fstek]
+const input = `bkwzkqsxq-tovvilokx-nozvyiwoxd-172[fstek]
 wifilzof-wbiwifuny-yhachyylcha-526[qrazx]
 jvyyvzpcl-jhukf-shivyhavyf-487[zhtsi]
 kwvacumz-ozilm-kivlg-kwvbiqvumvb-694[gknyw]

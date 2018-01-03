@@ -1,50 +1,31 @@
 "use strict";
 
 function calc() {
-	var display = new Display(50, 6);
+	let display = new Display(50, 6);
 
-	input.split("\n").forEach(function(line) {
-		display.doCommand(line);
-	});
+	input.split("\n").forEach(line => display.doCommand(line));
 
-	return display.getNumberOfLitPixels() + "<pre><code>" + display.logPixelsToString() + "</code></pre>";
+	return display.getNumberOfLitPixels() + 
+		"<pre><code>" + display.logPixelsToString() + "</code></pre>";
 }
 
 function Display(width, height) {
-	var pixels = [];
+	let pixels = [];
 
-	for (var j = 0; j < height; ++j) {
-		var row = new Array(width);
+	for (let j = 0; j < height; ++j) {
+		let row = new Array(width);
 		row.fill(0);
 		pixels.push(row);
 	}
 
-	this.logPixelsToString = function() {
-		var res = "";
-		for (var y = 0; y < height; ++y) {
-			/*
-			 * replace all '0' with '.', and '1' with "#" 
-			 * (http://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript)
-			 */
-			res += pixels[y].join("").split("0").join(".").split("1").join("#") + "\n";
-		}
+	this.logPixelsToString = () => pixels.reduce((s, line) => 
+		s + line.join("").split("0").join(".").split("1").join("#") + "\n", "");
 
-		return res;
-	}
-
-	this.getNumberOfLitPixels = function() {
-		var res = 0;
-		for (var y = 0; y < height; ++y) {
-			for (var x = 0; x < width; ++x) {
-				res += pixels[y][x];
-			}
-		}
-
-		return res;
-	}
+	this.getNumberOfLitPixels = () => pixels.reduce((s, line) => 
+		s + line.reduce((ls, p) => ls + +p), 0);
 
 	this.doCommand = function(command) {
-		var args = command.split(" ");
+		let args = command.split(" ");
 		if (args[0] == "rect" && args.length == 2) {
 			doRect(args[1].split("x")[0], args[1].split("x")[1]);
 		} else if (args[0] == "rotate" && args.length == 5 && args[3] == "by") {
@@ -61,8 +42,8 @@ function Display(width, height) {
 	}
 
 	function doRect(w, h) {
-		for (var y = 0; y < h; ++y) {
-			for (var x = 0; x < w; ++x) {
+		for (let y = 0; y < h; ++y) {
+			for (let x = 0; x < w; ++x) {
 				pixels[y][x] = 1;
 			}
 		}
@@ -73,9 +54,9 @@ function Display(width, height) {
 			return;
 		}
 
-		var row = new Array(width);
+		let row = new Array(width);
 
-		for (var x = 0; x < width; ++x) {
+		for (let x = 0; x < width; ++x) {
 			row[(x + n) % width] = pixels[y][x];
 		}
 
@@ -89,17 +70,17 @@ function Display(width, height) {
 
 		var column = new Array(height);
 
-		for (var y = 0; y < height; ++y) {
+		for (let y = 0; y < height; ++y) {
 			column[(y + n) % height] = pixels[y][x];
 		}
 
-		for (var y = 0; y < height; ++y) {
+		for (let y = 0; y < height; ++y) {
 			pixels[y][x] = column[y];
 		}
 	}	
 }
 
-var input = `rect 1x1
+const input = `rect 1x1
 rotate row y=0 by 5
 rect 1x1
 rotate row y=0 by 5

@@ -1,46 +1,23 @@
 "use strict";
 
 function calc() {
-	var discs = parseDiscs();
-	var discs2 = discs.slice();
-	
-	discs2.push([11, discs.length + 1]);
+	const discs = input.split("\n").map(line => line.match(/\d+/g).map(Number));
+	const discs2 = [...discs, [discs.length, 11, 0, 1]];
 
 	return getStartTime(discs) + " " + getStartTime(discs2);
 }
 
 function getStartTime(discs) {
-	var time = 0;
+	let time = 0;
 
-	for (var found = false; !found;) {
-		var found = true;
-		
-		for (var i = 0; i < discs.length && found; ++i) {
-			found &= !((discs[i][1] + time) % discs[i][0]);
-		}
-
-		if (!found) {
-			++time;
-		} 
+	while (!discs.every(d => !((d[0] + d[2] + d[3] + time) % d[1]))) {
+		++time;
 	}
 
 	return time;
 }
 
-function parseDiscs() {
-	var discs = [];
-
-	input.split("\n").forEach(function(line) {
-		var tokens = line.split(" ");
-		var positions = +tokens[3];
-		var offset = (+tokens[11] + discs.length + 1) % positions;
-		discs.push([positions, offset]);
-	});
-
-	return discs;
-}
-
-var input = `Disc #1 has 17 positions; at time=0, it is at position 1.
+const input = `Disc #1 has 17 positions; at time=0, it is at position 1.
 Disc #2 has 7 positions; at time=0, it is at position 0.
 Disc #3 has 19 positions; at time=0, it is at position 2.
 Disc #4 has 5 positions; at time=0, it is at position 0.

@@ -1,44 +1,26 @@
 "use strict";
 
 function calc() {
-	var botProcessor = new BotProcessor(valuesToCompare);
+	let botProcessor = new BotProcessor(valuesToCompare);
 
-	input.split("\n").forEach(function(line) {
-		botProcessor.doInstruction(line, false);
-	});
-
-	input.split("\n").forEach(function(line) {
-		botProcessor.doInstruction(line, true);
-	});
+	input.split("\n").forEach(line => botProcessor.doInstruction(line, false));
+	input.split("\n").forEach(line => botProcessor.doInstruction(line, true));
 
 	return botProcessor.getAlarmedBot() + " " + botProcessor.getOutputMult(outputs);
 }
 
 function BotProcessor(alarmedValues) {
-	var bots = [];
-	var output = [];
-	var alarmedBotNumber = null;
+	let bots = [];
+	let output = [];
+	let alarmedBotNumber = null;
 
-	this.getAlarmedBot = function() {
-		return alarmedBotNumber;
-	}
+	this.getAlarmedBot = () => alarmedBotNumber;
 
-	this.getOutputMult = function(outputNumbers) {
-		var res = 1;
-	
-		outputNumbers.forEach(function(outputNumber) {
-			if (output[outputNumber] != undefined) {
-				output[outputNumber].forEach(function(v) {
-					res *= v;
-				});
-			}
-		});
+	this.getOutputMult = outputNumbers => outputNumbers.reduce((m, o) => 
+		m * (output[o] || []).reduce((om, v) => om * v, 1), 1);
 
-		return res;
-	}
-
-	this.doInstruction = function(instruction, pass2) {
-		var args = instruction.split(" ");
+	this.doInstruction = (instruction, pass2) => {
+		let args = instruction.split(" ");
 		try {
 			if (args[0] == "value" && pass2) {
 				doValue(args);
@@ -53,18 +35,18 @@ function BotProcessor(alarmedValues) {
 	}
 
 	function doValue(args) {
-		if (args.slice(2, 5).join(" ") != "goes to bot") {
+		if (args.slice(2, 5).join(" ") !== "goes to bot") {
 			throw new SyntaxError(args.join(" "));
 		}
 		
-		var value = +args[1];
-		var botNumber = +args[5];
+		const value = +args[1];
+		const botNumber = +args[5];
 		
 		giveValue(botNumber, value);
 	}
 
 	function giveValue(botNumber, value) {
-		var bot = bots[botNumber];
+		let bot = bots[botNumber];
 
 		if (bot == undefined) {
 			throw new RangeError("Bot " + botNumber + " not found");
@@ -77,9 +59,7 @@ function BotProcessor(alarmedValues) {
 				alarmedBotNumber = botNumber;
 			}
 
-			var values = bot.values.sort(function(a, b) {
-				return a - b;
-			});
+			let values = bot.values.sort((a, b) => a - b);
 
 			bot.values = [];
 
@@ -108,38 +88,33 @@ function BotProcessor(alarmedValues) {
 	}
 
 	function doBot(args) {
-		if (args.slice(2, 5).join(" ") != "gives low to" 
-				|| args.slice(7, 10).join(" ") != "and high to") {
+		if (args.slice(2, 5).join(" ") !== "gives low to" 
+				|| args.slice(7, 10).join(" ") !== "and high to") {
 			throw new SyntaxError(args.join(" "));
 		}
 
-		var botNumber = +args[1];
-
-		var lowTo = +args[6];
+		let botNumber = +args[1];
+		let lowTo = +args[6];
 
 		if (args[5] == "output") {
 			lowTo = -lowTo - 1;
 		}
 
-		var highTo = +args[11];
+		let highTo = +args[11];
 
 		if (args[10] == "output") {
 			highTo = -highTo - 1;
 		}
 
-		bots[botNumber] = {
-			lowTo: lowTo, 
-			highTo: highTo,
-			values: [],
-		};
+		bots[botNumber] = {lowTo, highTo, values: []};
 	}
 }
 
-var valuesToCompare = [61, 17];
+const valuesToCompare = [61, 17];
 
-var outputs = [0, 1, 2];
+const outputs = [0, 1, 2];
 
-var input = `bot 153 gives low to bot 105 and high to bot 10
+const input = `bot 153 gives low to bot 105 and high to bot 10
 bot 84 gives low to bot 149 and high to bot 198
 bot 32 gives low to bot 124 and high to bot 76
 bot 177 gives low to output 8 and high to bot 19

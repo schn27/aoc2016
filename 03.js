@@ -1,58 +1,33 @@
 "use strict";
 
 function calc() {
-	var sides = convertInputToArray();
-	return calcHorizontal(sides) + " " + calcVertical(sides);
+	const sides = input.split("\n").map(line => line.match(/\d+/g).map(Number));
+	const sidesV = getVerticalSides(sides);
+	return getTriangles(sides) + " " + getTriangles(sidesV);
 }
 
-function calcHorizontal(sides) {
-	var triangles = 0;
+function getTriangles(sides) {
+	return sides.filter(s => isTriangle(s)).length;
+}
 
-	for (var i = 0; i < sides.length; i += 3) {
-		if (isTriangle([sides[i], sides[i + 1], sides[i + 2]])) {
-			++triangles;
+function getVerticalSides(sides) {
+	let sidesV = [];
+
+	for (let i = 0; i < sides.length; i += 3) {
+		for (let j = 0; j < 3; ++j) {
+			sidesV.push([sides[i][j], sides[i + 1][j], sides[i + 2][j]]);
 		}
 	}
 
-	return triangles;
-}
-
-function calcVertical(sides) {
-	var triangles = 0;
-
-	for (var i = 0; i < sides.length; i += 9) {
-		for (var j = 0; j < 3; ++j) {
-			if (isTriangle([sides[i + j], sides[i + j + 3], sides[i + j + 6]])) {
-				++triangles;
-			}
-		}
-	}
-
-	return triangles;
+	return sidesV;
 }
 
 function isTriangle(sides) {
-	sides.sort(function(a, b) {
-		return a - b;
-	});
-	return sides[0] + sides[1] > sides[2];
+	let s = sides.slice().sort((a, b) => a - b);
+	return s[0] + s[1] > s[2];
 }
 
-function convertInputToArray() {
-	var sides = [];
-
-	input.split("\n").forEach(function(line) {
-		line.split(" ").filter(function(e) {
-			return e && e.length !== 0;
-		}).forEach(function(side) {
-			sides.push(+side);
-		});
-	});
-
-	return sides;
-}
-
-var input = `  775  785  361
+const input = `  775  785  361
   622  375  125
   297  839  375
   245   38  891

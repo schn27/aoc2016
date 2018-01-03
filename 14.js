@@ -8,20 +8,20 @@ function calc() {
 }
 
 function find64Keys(hashStore) {
-	var keys = 0;
-	var result = 0;
+	let keys = 0;
+	let result = 0;
 
-	for (var index = 0; keys < 64; ++index) {
-		var hash = hashStore.get(index);
-		var tripleChar = getTriple(hash);
+	for (let index = 0; keys < 64; ++index) {
+		let hash = hashStore.get(index);
+		let tripleChar = getTriple(hash);
 		
 		if (tripleChar != null) {
-			var found = false;
-			var marker = new Array(5);
+			let found = false;
+			let marker = new Array(5);
 			marker.fill(tripleChar);
 			marker = marker.join("");
 
-			for (var i = 1; i <= 1000 && !found; ++i) {
+			for (let i = 1; i <= 1000 && !found; ++i) {
 				if (hashStore.get(index + i).indexOf(marker) >= 0) {
 					found = true;
 				}
@@ -38,7 +38,7 @@ function find64Keys(hashStore) {
 }
 
 function getTriple(hash) {
-	for (var i = 0; i < hash.length - 2; ++i) {
+	for (let i = 0; i < hash.length - 2; ++i) {
 		if ((hash[i] == hash[i + 1]) && (hash[i] == hash[i + 2])) {
 			return hash[i];
 		}
@@ -48,10 +48,10 @@ function getTriple(hash) {
 }
 
 function HashStore(n) {
-	var stretching = n || 1;
-	var store = [];
+	const stretching = n || 1;
+	let store = [];
 
-	this.get = function(index) {
+	this.get = index => {
 		if (store[index] == undefined) {
 			store[index] = getStretchedHash(input + index);
 		}
@@ -60,9 +60,9 @@ function HashStore(n) {
 	}
 
 	function getStretchedHash(value) {
-		var hash = md5(value);
+		let hash = md5(value);
 		
-		for (var i = stretching - 1; i > 0; --i) {
+		for (let i = stretching - 1; i > 0; --i) {
 			hash = md5(hash);
 		}
 
@@ -70,4 +70,4 @@ function HashStore(n) {
 	}
 }
 
-var input = "zpqevtbw";
+const input = "zpqevtbw";

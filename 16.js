@@ -6,32 +6,27 @@ function calc() {
 
 function getData(str, size) {
 	while (str.length < size) {
-		var result = str + "0";
-		
-		str.split("").reverse().forEach(function(c) {
-			result += c == "0" ? "1" : "0";
-		});
-
-		str = result;
+		str += "0" + str.split("").reverse().map(c => c === "0" ? "1" : "0").join("");
 	}
 
 	return str.slice(0, size);
 }
 
 function getCheckSum(str) {
-	while (!(str.length % 2)) {
-		var result = [];
+	let res = str.split("");
 
-		for (var i = 0; i < str.length; i += 2) {
-			result.push(str[i] == str[i + 1] ? "1" : "0");
-		}
-
-		str = result.join("");
+	while (!(res.length % 2)) {
+		res = res.reduce((a, e, i) => {
+			if (!(i & 1)) {
+				a.push(res[i] === res[i + 1] ? "1" : "0")
+			}
+			return a;
+		}, []);
 	}
 
-	return str;
+	return res.join("");
 }
 
-var input = "00111101111101000";
-var size = 272;
-var size2 = 35651584;
+const input = "00111101111101000";
+const size = 272;
+const size2 = 35651584;

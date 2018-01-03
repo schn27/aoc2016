@@ -1,55 +1,34 @@
 "use strict";
 
 function calc() {
-	var charCounters = [];
+	let charCounters = [];
 
-	input.split("\n").forEach(function(line) {
-		for (var i = 0; i < line.length; ++i) {
-			if (charCounters[i] == undefined) {
-				charCounters[i] = [];
-			}
-
-			var c = line[i];
-
-			if (charCounters[i][c] == undefined) {
-				charCounters[i][c] = 1;
-			} else {
-				++charCounters[i][c];
-			}
-		}
-	});
-
-	var message = "";
-	var message2 = "";
-
-	charCounters.forEach(function(o) {
-		var counters = [];
-		for (var key in o) {
-			if (o.hasOwnProperty(key)) {
-				counters.push([key, o[key]]);
-			}
+	input.split("\n").forEach(line => line.split("").forEach((c, i) => {
+		if (charCounters[i] == undefined) {
+			charCounters[i] = {};
 		}
 
-		counters.sort(function(a, b) {
-			return b[1] - a[1];
-		});
+		charCounters[i][c] = (charCounters[i][c] || 0) + 1;
+	}));
 
+	let message = "";
+	let message2 = "";
+
+	charCounters.forEach(o => {
+		let counters = Object.keys(o).map(key => [key, o[key]]);
+
+		counters.sort((a, b) => b[1] - a[1]);
 		message += counters[0][0];
 
-		counters.sort(function(a, b) {
-			return a[1] - b[1];
-		});
-
+		counters.sort((a, b) => a[1] - b[1]);
 		message2 += counters[0][0];
-
 	});
 
 
 	return message + " " + message2;
 }
 
-
-var input = `xgadmpyq
+const input = `xgadmpyq
 kzgagqyc
 otfatqvh
 kekjvmlr
