@@ -1,14 +1,13 @@
 "use strict";
 
 function calc() {
-	var pattern = "0101010101010101010101010101010101010101010101010101010101010101";
+	const program = input.split("\n").map(line => line.split(" "));
+	const pattern = "010101010101010101010101010101";
 
-	for (var a = 0; ; ++a) {
-		var cpu = new Cpu(input, pattern);
+	for (let a = 0; ; ++a) {
+		let cpu = new Cpu(getProgramCopy(program), pattern);
 		cpu.setRegisterValue("a", a);
-		cpu.execute();
-
-		if (cpu.getOutput().join("") == pattern) {
+		if (cpu.execute()) {
 			return a;
 		}
 	}
@@ -16,148 +15,60 @@ function calc() {
 	return null;
 }
 
-function Cpu(programText, outputPattern) {
-	var program = parseProgramText(programText);
+function getProgramCopy(program) {
+	return program.map(c => c.slice());
+}
 
-	var registers = {pc: 0, a: 0, b: 0, c: 0, d: 0};
+function Cpu(program, outputPattern) {
+	let registers = {pc: 0, a: 0, b: 0, c: 0, d: 0};
+	let output = [];
 
-	var output = [];
-
-	this.execute = function() {
+	this.execute = () => {
 		while ((registers.pc < program.length) && checkOutput()) {
-			var command = program[registers.pc];
+			let cmd = program[registers.pc];
 
-			switch (command.operation) {
-			case "cpy":
-				doCpy(command.operand, command.operand2);
-				break;
-			case "inc":
-				doInc(command.operand);
-				break;
-			case "dec":
-				doDec(command.operand);
-				break;
-			case "jnz":
-				doJnz(command.operand, command.operand2);
-				break;
-			case "tgl":
-				doTgl(command.operand);
-				break;
-			case "out":
-				doOut(command.operand);
-				break;
-			default:
-				doNop();
+			if (cmd[0] === "cpy") {
+				registers[cmd[2]] = getValue(cmd[1]);
+			} else if (cmd[0] === "inc") {
+				++registers[cmd[1]];
+			} else if (cmd[0] === "dec") {
+				--registers[cmd[1]];
+			} else if (cmd[0] === "jnz") {
+				if (getValue(cmd[1]) != 0) {
+					registers.pc += getValue(cmd[2]) - 1;
+				}
+			} else if (cmd[0] === "tgl") {
+				const addr = registers.pc + getValue(cmd[1]);
+
+				if (addr >= 0 && addr < program.length) {
+					const table = {cpy: "jnz", inc: "dec", dec: "inc", jnz: "cpy", tgl: "inc"};
+					let command = program[addr];
+					command[0] = table[command[0]] || command[0];
+				}				
+			} else if (cmd[0] === "out") {
+				output.push(getValue(cmd[1]));
 			}
-		}
-	}
 
-	this.getRegisterValue = function(registerName) {
-		return registers[registerName];
-	}
-
-	this.setRegisterValue = function(registerName, value) {
-		registers[registerName] = value;
-	}
-
-	this.getOutput = function() {
-		return output;
-	}
-
-	function doCpy(operand, operand2) {
-		if (registers[operand2] != undefined) {
-			registers[operand2] = getValue(operand);
-		}
-
-		++registers.pc;
-	}
-
-	function doInc(operand) {
-		if (registers[operand] != undefined) {
-			++registers[operand];
-		}
-
-		++registers.pc;
-	}
-
-	function doDec(operand) {
-		if (registers[operand] != undefined) {
-			--registers[operand];
-		}
-
-		++registers.pc;
-	}
-
-	function doJnz(operand, operand2) {
-		if (getValue(operand) != 0) {
-			registers.pc += getValue(operand2);
-		} else {
 			++registers.pc;
 		}
+
+		return outputPattern.slice(0, output.length) === output.join("");
 	}
 
-	function doTgl(operand) {
-		var addr = registers.pc + getValue(operand);
-
-		if (addr >= 0 && addr < program.length) {
-			var command = program[addr];
-
-			switch (command.operation) {
-			case "cpy":
-				command.operation = "jnz";
-				break;
-			case "inc":
-				command.operation = "dec";
-				break;
-			case "dec":
-				command.operation = "inc";
-				break;
-			case "jnz":
-				command.operation = "cpy";
-				break;
-			case "tgl":
-				command.operation = "inc";
-				break;
-			default:
-				doNop();
-			}
-
-			program[addr] = command;
-		}
-
-		++registers.pc;
-	}
-
-	function doOut(operand) {
-		output.push(getValue(operand));
-		++registers.pc;
-	}
-
-	function doNop() {
-		++registers.pc;
-	}
+	this.getRegisterValue = (reg) => registers[reg];
+	this.setRegisterValue = (reg, value) => registers[reg] = value;
+	this.getOutput = () => output;
 
 	function getValue(operand) {
-		return (operand in registers) ? registers[operand] : parseInt(operand, 10);
+		return (operand in registers) ? registers[operand] : +operand;
 	}
 
 	function checkOutput() {
-		return (output.length < outputPattern.length) && (outputPattern.slice(0, output.length) == output.join(""));
-	}
-
-	function parseProgramText(text) {
-		var code = [];
-
-		text.split("\n").forEach(function(line) {
-			var command = line.split(" ");
-			code.push({operation: command[0], operand: command[1], operand2: command[2]});
-		});
-
-		return code;
+		return (output.length < outputPattern.length) && (outputPattern.slice(0, output.length) === output.join(""));
 	}
 }
 
-var input = `cpy a d
+const input = `cpy a d
 cpy 14 c
 cpy 182 b
 inc d

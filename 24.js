@@ -1,29 +1,29 @@
 "use strict";
 
 function calc() {
-	var map = parseInput();
-	var optimal = getOptimalPath(map, false);
-	var optimalLooped = getOptimalPath(map, true);
+	let map = parseInput();
+	let optimal = getOptimalPath(map, false);
+	let optimalLooped = getOptimalPath(map, true);
 
 	return optimal + " " + optimalLooped;
 }
 
 function getOptimalPath(map, looped) {
-	var distMatrix = getDistMatrix(map);
+	let distMatrix = getDistMatrix(map);
 
-	var optimalLength = null;
+	let optimalLength = null;
 
-	var targets = [];
-	for (var i = 1; i < map.targets.length; ++i) {
+	let targets = [];
+	for (let i = 1; i < map.targets.length; ++i) {
 		targets.push(i);
 	}
 
-	for (var p = 0, totalPermutations = getFactorial(targets.length); p < totalPermutations; ++p) {
-		var arrangedTargets = getPermutation(targets, p);
-		var prevTarget = 0;
-		var length = 0;
+	for (let p = 0, totalPermutations = getFactorial(targets.length); p < totalPermutations; ++p) {
+		let arrangedTargets = getPermutation(targets, p);
+		let prevTarget = 0;
+		let length = 0;
 
-		for (var i = 0; i < arrangedTargets.length; ++i) {
+		for (let i = 0; i < arrangedTargets.length; ++i) {
 			length += distMatrix[prevTarget][arrangedTargets[i]];
 			prevTarget = arrangedTargets[i];
 
@@ -45,17 +45,17 @@ function getOptimalPath(map, looped) {
 }
 
 function getDistMatrix(map) {
-	var distMatrix = new Array();
+	let distMatrix = new Array();
 
-	for (var i = 0; i < map.targets.length; ++i) {
-		var row = new Array(map.targets.length);
+	for (let i = 0; i < map.targets.length; ++i) {
+		let row = new Array(map.targets.length);
 		row.fill(0);
 		distMatrix.push(row);
 	}	
 
-	for (var i = 0; i < map.targets.length - 1; ++i) {
-		for (var j = i + 1; j < map.targets.length; ++j) {
-			var dist = getWaveSteps(map.targets[i], map.targets[j], map.maze);
+	for (let i = 0; i < map.targets.length - 1; ++i) {
+		for (let j = i + 1; j < map.targets.length; ++j) {
+			let dist = getWaveSteps(map.targets[i], map.targets[j], map.maze);
 			distMatrix[i][j] = distMatrix[j][i] = dist;
 		}
 	}
@@ -64,21 +64,23 @@ function getDistMatrix(map) {
 }
 
 function getWaveSteps(src, dst, maze) {
-	var wave = [];
+	let wave = [];
 
-	for (var y = 0; y < maze.length; ++y) {
+	for (let y = 0; y < maze.length; ++y) {
 		wave.push(new Array(maze[y].length));
 	}
 
 	wave[dst[1]][dst[0]] = 0;
 
-	var moves = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+	const moves = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
-	for (var step = 1; wave[src[1]][src[0]] == undefined; ++step) {
-		for (var y = 0; y < wave.length; ++y) {
-			for (var x = 0; x < wave[y].length; ++x) {
+	let step;
+
+	for (step = 1; wave[src[1]][src[0]] == undefined; ++step) {
+		for (let y = 0; y < wave.length; ++y) {
+			for (let x = 0; x < wave[y].length; ++x) {
 				if (wave[y][x] == step - 1) {
-					moves.forEach(function(move) {
+					moves.forEach(move => {
 						if ((maze[y + move[1]][x + move[0]] == ".") && (wave[y + move[1]][x + move[0]] == undefined)) {
 							wave[y + move[1]][x + move[0]] = step;
 						}						
@@ -91,12 +93,12 @@ function getWaveSteps(src, dst, maze) {
 	return step - 1;
 }
 
-// http://stackoverflow.com/questions/7918806/finding-n-th-permutation-without-computing-others/24257996#24257996
 function getPermutation(atoms, index) {
-	var src = atoms.slice(), dest = [], item;
+	let src = atoms.slice();
+	let dest = [];
 
-	for (var i = 0; i < atoms.length; ++i) {
-		item = index % src.length;
+	for (let i = 0; i < atoms.length; ++i) {
+		let item = index % src.length;
 		index = Math.floor(index / src.length);
 		dest.push(src[item]);
 		src.splice(item, 1);
@@ -106,7 +108,7 @@ function getPermutation(atoms, index) {
 }
 
 function getFactorial(n) {
-	var result = n;
+	let result = n;
 	
 	while (--n > 0) {
 		result *= n;
@@ -116,15 +118,12 @@ function getFactorial(n) {
 }
 
 function parseInput() {
-	var result = {
-		maze: [],
-		targets: []
-	};
+	let result = {maze: [], targets: []};
 
-	input.split("\n").forEach(function(line) {
-		var row = [];
+	input.split("\n").forEach(line => {
+		let row = [];
 		
-		line.split("").forEach(function(c) {
+		line.split("").forEach(c => {
 			if (c >= "0" && c <= "9") {
 				result.targets[+c] = [row.length, result.maze.length];
 				c = ".";
@@ -139,7 +138,7 @@ function parseInput() {
 	return result;
 }
 
-var input = `#####################################################################################################################################################################################
+const input = `#####################################################################################################################################################################################
 #.....#...#.#...............#...........#.......#.#...#.......#...#.......#.....#.............#.........#...#.........#.......#.#.#4....#.....#...#.......#.........#.#.....#.......#
 ###.###.#.#.###.###.#.#####.#.###.#.###.#.#.#.#.#.#.#.###.###.#.#.#.###.#.#.###.#.###.#.#.#######.#.#.#.###.#.#.#.###.#.#####.#.#.###.###.#.###.#.###.#.#.#.###.###.#.#.#.#.#.#.#.###
 #...#.....#.....#...#.......#.#.#.#.#...#.....#.#...#.....#...#...#.#...#.#.......#.....#.#.........#...#.#.#...#...#.........#...#.......#.#...#.........#.#...#...#.#.#.#.....#...#

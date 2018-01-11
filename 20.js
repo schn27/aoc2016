@@ -1,7 +1,7 @@
 "use strict";
 
 function calc() {
-	var list = optimizeList(getSortedList(input));	
+	const list = optimizeList(getSortedList(input));	
 	return getMinimalAllowedIp(list) + " " + getNumberOfAllowedIps(list);
 }
 
@@ -10,28 +10,21 @@ function getMinimalAllowedIp(list) {
 }
 
 function getNumberOfAllowedIps(list) {
-	var result = Math.pow(2, 32);
-
-	list.forEach(function(range) {
-		result -= (range[1] - range[0]) + 1;
-	});
-
-	return result;
+	return Math.pow(2, 32) - list.reduce((s, e) => s + e[1] - e[0] + 1, 0);
 }
 
 function optimizeList(list) {
-	var optimizedList = [];
+	let optimizedList = [];
 
-	list.forEach(function(range) {
+	list.forEach(range => {
 		if (optimizedList.length == 0) {
 			optimizedList.push(range);
 		} else {
-			var prevRange = optimizedList[optimizedList.length - 1].slice();
+			let prevRange = optimizedList[optimizedList.length - 1];
 			if (range[0] > prevRange[1] + 1) {
 				optimizedList.push(range);
 			} else if (range[1] > prevRange[1]) {
 				prevRange[1] = range[1];
-				optimizedList[optimizedList.length - 1] = prevRange;
 			}
 		}
 	});
@@ -40,31 +33,11 @@ function optimizeList(list) {
 }
 
 function getSortedList(listText) {
-	var list = [];
-	var highestIp = Math.pow(2, 32) - 1;
-
-	input.split("\n").forEach(function(line) {
-		var tokens = line.split("-");
-		var range = [+tokens[0], +tokens[1]];
-
-		if (range[0] <= highestIp) {
-			if (range[1] > highestIp) {
-				range[1] = highestIp;
-			}
-
-			list.push(range);
-		}
-	});
-
-	list.sort(function(a, b) {
-		var res = a[0] - b[0];
-		return res != 0 ? res : a[1] - b[1];
-	});
-
-	return list;
+	return input.split("\n").map(line => line.split("-").map(Number))
+		.sort((a, b) => (a[0] != b[0]) ? a[0] - b[0] : a[1] - b[1]);
 }
 
-var input = `1873924193-1879728099
+const input = `1873924193-1879728099
 2042754084-2076891856
 4112318198-4113899685
 1039794493-1057170966

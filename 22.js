@@ -1,27 +1,23 @@
 "use strict";
 
 function calc() {
-	var grid = parseInput();
+	let grid = parseInput();
 
-	//TODO: not completed!
-	return getViablePairs(grid) + "<br>" + grid.join("<br>");//getStepsForDataTransfer(grid, [grid.length - 1, 0], [0, 0]);
+	return getViablePairs(grid) + "<br>" + getStepsForDataTransfer(grid, [grid.length - 1, 0], [0, 0]);
 }
 
 function getStepsForDataTransfer(grid, src, dst) {
-	return "not implemented";
+	//TODO: not completed!
+	return grid.map(r => r.map(e => e.used > 100 ? "#" : (e.size - e.used > 80 ? "-" : "*"))).join("<br>");
 }
 
 function getViablePairs(grid) {
-	var list = [];
+	let list = grid.reduce((s, r) => s.concat(r), []);
 
-	grid.forEach(function(row) {
-		list = list.concat(row);
-	});
+	let viablePairs = 0;
 
-	var viablePairs = 0;
-
-	for (var i = 0; i < list.length - 1; ++i) {
-		for (var j = i + 1; j < list.length; ++j) {
+	for (let i = 0; i < list.length - 1; ++i) {
+		for (let j = i + 1; j < list.length; ++j) {
 			if ((list[i].used != 0) && (list[j].used + list[i].used <= list[j].size)) {
 				++viablePairs;
 			}
@@ -35,43 +31,25 @@ function getViablePairs(grid) {
 }
 
 function parseInput() {
-	var grid = [];
+	let grid = [];
 
-	input.split("\n").forEach(function(line) {
-		if (line[0] == "/") {
-			var tokens = line.split(" ").filter(function(e) {
-				return e && e.length != 0;
-			});
-			
-			var nameTokens = tokens[0].split("-");
-			var x = +nameTokens[1].slice(1);
-			var y = +nameTokens[2].slice(1);
-			var info = {
-				size: +tokens[1].split("T")[0],
-				used: +tokens[2].split("T")[0],
-				toString: function() {
-					if (this.used > 100) {
-						return "#";
-					} else if ((this.size - this.used) > 80) {
-						return "_";
-					} else {
-						return "*";
-					}
-				}
-			};
+	input.split("\n")
+		.map(line => line.match(/\d+/g)).filter(e => e != null).map(e => e.map(Number))
+		.sort((a, b) => a[1] != b[1] ? a[1] - b[1] : a[0] - b[0])
+		.forEach(e => {
+			let y = e[1];
 
-			if (grid[x] == undefined) {
-				grid[x] = [];
+			if (grid[y] == undefined) {
+				grid[y] = [];
 			}
 
-			grid[x][y] = info;
-		}
-	});
+			grid[y].push({size: e[2], used: e[3]});
+		});
 
 	return grid;
 }
 
-var input = `root@ebhq-gridcenter# df -h
+const input = `root@ebhq-gridcenter# df -h
 Filesystem              Size  Used  Avail  Use%
 /dev/grid/node-x0-y0     94T   72T    22T   76%
 /dev/grid/node-x0-y1     88T   73T    15T   82%

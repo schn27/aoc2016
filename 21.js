@@ -1,30 +1,22 @@
 "use strict";
 
 function calc() {
-	var scrambler = new Scrambler("abcdefgh");
+	let scrambler = new Scrambler("abcdefgh");
+	input.split("\n").forEach(line => scrambler.doCommand(line));
 
-	input.split("\n").forEach(function(line) {
-		scrambler.doCommand(line);
-	});
-
-	var unScrambler = new Scrambler("fbgdceah");
-
-	input.split("\n").reverse().forEach(function(line) {
-		unScrambler.doCommand(line, "undo");
-	});
+	let unScrambler = new Scrambler("fbgdceah");
+	input.split("\n").reverse().forEach(line => unScrambler.doCommand(line, "undo"));
 
 	return scrambler.getScrambled() + " " + unScrambler.getScrambled();
 }
 
 function Scrambler(initString) {
-	var scrambled = initString.split("");
+	let scrambled = initString.split("");
 
-	this.getScrambled = function() {
-		return scrambled.join("");
-	}
+	this.getScrambled = () => scrambled.join("");
 
-	this.doCommand = function(command, undo) {
-		var tokens = command.split(" ");
+	this.doCommand = (command, undo) => {
+		let tokens = command.split(" ");
 
 		switch (tokens[0] + " " + tokens[1]) {
 		case "swap position":
@@ -74,19 +66,11 @@ function Scrambler(initString) {
 	}
 
 	function doSwapPosition(x, y) {
-		var sx = scrambled[x];
-		scrambled[x] = scrambled[y];
-		scrambled[y] = sx;
+		[scrambled[x], scrambled[y]] = [scrambled[y], scrambled[x]];
 	}
 
 	function doSwapLetter(x, y) {
-		for (var i = 0; i < scrambled.length; ++i) {
-			if (scrambled[i] == x) {
-				scrambled[i] = y;
-			} else if (scrambled[i] == y) {
-				scrambled[i] = x;
-			}
-		}
+		scrambled = scrambled.map(c => c == x ? y : (c == y ? x : c));
 	}
 
 	function doRotateLeft(x) {
@@ -98,19 +82,19 @@ function Scrambler(initString) {
 	}
 
 	function doRotateBased(x) {
-		var index = scrambled.indexOf(x);
+		let index = scrambled.indexOf(x);
 		rotate(1 + index + (index >= 4 ? 1 : 0));
 	}
 
 	function undoRotateBased(x) {
-		var steps = [1, 1, 6, 2, 7, 3, 0, 4];
+		const steps = [1, 1, 6, 2, 7, 3, 0, 4];
 		rotate(-steps[scrambled.indexOf(x)]);
 	}
 
 	function rotate(steps) {
-		var result = new Array(scrambled.length);
+		let result = new Array(scrambled.length);
 		
-		for (var i = 0; i < scrambled.length; ++i) {
+		for (let i = 0; i < scrambled.length; ++i) {
 			if (steps >= 0) {
 				result[(i + steps) % scrambled.length] = scrambled[i];
 			} else {
@@ -126,13 +110,13 @@ function Scrambler(initString) {
 	}
 
 	function doMove(x, y) {
-		var result = scrambled.slice(0, x).concat(scrambled.slice(x + 1, scrambled.length));
+		let result = scrambled.slice(0, x).concat(scrambled.slice(x + 1, scrambled.length));
 		result = result.slice(0, y).concat(scrambled[x]).concat(result.slice(y, result.length));
 		scrambled = result;
 	}
 }
 
-var input = `swap position 2 with position 7
+const input = `swap position 2 with position 7
 swap letter f with letter a
 swap letter c with letter a
 rotate based on position of letter g

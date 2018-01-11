@@ -1,50 +1,34 @@
 "use strict";
 
 function calc() {
-	var row = input.split("");
-	var numberOfSafeTiles = getNumberOfSafeTiles(row);
+	let row = input.split("");
+	let numberOfSafeTiles = 0;
+	let numberOfSafeTiles1 = null;
 
-	for (var rowCounter = 1; rowCounter < requiredRows; ++rowCounter) {
-		row = generateRowFrom(row);
+	for (let i = 0; i < requiredRows2; ++i) {
+		if (numberOfSafeTiles1 == null && i >= requiredRows) {
+			numberOfSafeTiles1 = numberOfSafeTiles;
+		}
+
 		numberOfSafeTiles += getNumberOfSafeTiles(row);
-	}
-
-	var numberOfSafeTiles2 = numberOfSafeTiles;
-
-	for (; rowCounter < requiredRows2; ++rowCounter) {
 		row = generateRowFrom(row);
-		numberOfSafeTiles2 += getNumberOfSafeTiles(row);
 	}
 
-	return numberOfSafeTiles + " " + numberOfSafeTiles2;
+	return numberOfSafeTiles1 + " " + numberOfSafeTiles;
 }
 
 function getNumberOfSafeTiles(row) {
-	var result = 0;
-
-	row.forEach(function(c) {
-		if (c == ".") {
-			++result;
-		}
-	});
-	
-	return result;
+	return row.filter(c => c == ".").length;
 }
 
 function generateRowFrom(row) {
-	var newRow = [];
-
-	for (var i = 0; i < row.length; ++i) {
-		newRow.push(getTileType(((i == 0) ? "." : row[i - 1]) + row[i] + ((i == row.length - 1) ? "." : row[i + 1])));
-	}
-
-	return newRow;
+	return row.map((c, i) => getTileType((row[i - 1] || ".") + c + (row[i + 1] || ".")));
 }
 
 function getTileType(tiles) {
 	return ((tiles == "^^.") || (tiles == ".^^") || (tiles == "^..") || (tiles == "..^")) ? "^" : ".";
 }
 
-var input = "......^.^^.....^^^^^^^^^...^.^..^^.^^^..^.^..^.^^^.^^^^..^^.^.^.....^^^^^..^..^^^..^^.^.^..^^..^^^..";
-var requiredRows = 40;
-var requiredRows2 = 400000;
+const input = "......^.^^.....^^^^^^^^^...^.^..^^.^^^..^.^..^.^^^.^^^^..^^.^.^.....^^^^^..^..^^^..^^.^.^..^^..^^^..";
+const requiredRows = 40;
+const requiredRows2 = 400000;
