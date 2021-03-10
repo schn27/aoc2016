@@ -1,52 +1,85 @@
 "use strict";
 
 function calc() {
-	let grid = parseInput();
+	const grid = getMarkedGrid(parseInput());
 
-	return getViablePairs(grid) + "<br>" + getStepsForDataTransfer(grid, [grid.length - 1, 0], [0, 0]);
+	const part1 = grid.reduce((a, r) => a + r.filter(c => c == ".").length, 0);
+	const part2 = getSteps(grid);
+
+	return part1 + " " + part2;
 }
 
-function getStepsForDataTransfer(grid, src, dst) {
-	//TODO: not completed!
-	return grid.map(r => r.map(e => e.used > 100 ? "#" : (e.size - e.used > 80 ? "-" : "*"))).join("<br>");
-}
+function getMarkedGrid(grid) {
+	const list = grid.reduce((s, r) => s.concat(r), []);
 
-function getViablePairs(grid) {
-	let list = grid.reduce((s, r) => s.concat(r), []);
-
-	let viablePairs = 0;
-
-	for (let i = 0; i < list.length - 1; ++i) {
-		for (let j = i + 1; j < list.length; ++j) {
-			if ((list[i].used != 0) && (list[j].used + list[i].used <= list[j].size)) {
-				++viablePairs;
-			}
-			if ((list[j].used != 0) && (list[i].used + list[j].used <= list[i].size)) {
-				++viablePairs;
-			}
-		}
-	}
-
-	return viablePairs;	
+	return grid.map(r => r.map(c => c.used == 0 ? "_" : 
+		list.find(e => (e !== c) && (c.used + e.used <= e.size)) ? "." : "#"));
 }
 
 function parseInput() {
-	let grid = [];
+	return input.split("\n")
+		.map(line => line.match(/\d+/g)).filter(e => e).map(e => e.map(Number))
+		.reduce((grid, [x, y, size, used]) => {
+			grid[y] = grid[y] || [];
+			grid[y][x] = {size, used};
+			return grid;
+		}, []);
+}
 
-	input.split("\n")
-		.map(line => line.match(/\d+/g)).filter(e => e != null).map(e => e.map(Number))
-		.sort((a, b) => a[1] != b[1] ? a[1] - b[1] : a[0] - b[0])
-		.forEach(e => {
-			let y = e[1];
+function getSteps(grid, goal = [grid[0].length - 1, 0], target = [0, 0]) {
+	const moves = [[-1, 0], [0, -1], [1, 0], [0, 1]];
 
-			if (grid[y] == undefined) {
-				grid[y] = [];
-			}
+	const visited = new Map();
 
-			grid[y].push({size: e[2], used: e[3]});
-		});
+	const setVisited = s => visited.set([...s.goal, ...s.pos].join(), s.steps);
+	const isVisited = s => s.steps >= visited.get([...s.goal, ...s.pos].join());
 
-	return grid;
+	const start = {pos: findXy(grid, "_"), goal, steps: 0};
+	setVisited(start);
+
+	for (let queue = [start], i = 0; queue.length != 0 && i < 100000; ++i) {
+		const s = queue.shift();
+		
+		setVisited(s);
+		const {pos, goal, steps} = s;
+
+		queue = queue.filter(s => !isVisited(s));
+
+		if (goal[0] == target[0] && goal[1] == target[1]) {
+			return steps;
+		}
+
+		const candidates = moves
+			.filter(([dx, dy]) => 
+				"._G".includes((grid[pos[1] + dy] || [])[pos[0] + dx]))
+			.map(([dx, dy]) => {
+				const newPos = [pos[0] + dx, pos[1] + dy];
+				const newGoal = (goal[0] == newPos[0] && goal[1] == newPos[1]) ?
+					[goal[0] - dx, goal[1] - dy] : [...goal];
+
+				return {pos: newPos, goal: newGoal, steps: steps + 1};
+			}).filter(s => !isVisited(s));
+
+		if (candidates.length > 0) {
+			queue.push(...candidates);
+
+			const getScore = (s) => 
+				(Math.abs(s.goal[0] - target[0]) + Math.abs(s.goal[1] - target[1])) * 30 + 
+				(Math.abs(s.pos[0] - target[0]) + Math.abs(s.pos[1] - target[1])) * 3 + 
+				(Math.abs(s.goal[0] - s.pos[0]) + Math.abs(s.goal[1] - s.pos[1])) * 6 +
+				s.steps;
+
+			queue.sort((a, b) => getScore(a) - getScore(b));
+		}
+	}
+
+	return undefined;
+}
+
+function findXy(grid, element) {
+	const rows = grid.map(r => r.findIndex(c => c == element));
+	const posY = rows.findIndex(x => x != -1);
+	return [rows[posY], posY];	
 }
 
 const input = `root@ebhq-gridcenter# df -h
